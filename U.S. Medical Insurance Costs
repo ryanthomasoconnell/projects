@@ -1,0 +1,145 @@
+#This project takes data on medically insured people in the U.S. and analyzes it to answer some key questions, such as an insured person's average age or location, what the average difference in cost is between smokers and non-smokers, and how age affects cost. We'll predict the cost of a hypothetical person using given parameters:
+
+###########################################################
+
+import csv
+#Lists of insurance variables:
+
+age = []
+sex = []
+bmi = []
+children = []
+smoker = []
+region = []
+charges = []
+
+#Read each column from csv file to its respective list:
+
+f = open('insurance.csv')
+csv_f = csv.reader(f)
+
+for row in csv_f:
+	age.append(row[0])
+	sex.append(row[1])
+	bmi.append(row[2])
+	children.append(row[3])
+	smoker.append(row[4])
+	region.append(row[5])
+	charges.append(row[6])
+
+#Edit above lists by deleting the item at index 0 in each to get rid of the headers, for calculations
+
+age.remove(age[0])
+sex.remove(sex[0])
+bmi.remove(bmi[0])
+children.remove(children[0])
+smoker.remove(smoker[0])
+region.remove(region[0])
+charges.remove(charges[0])
+
+
+
+###########################################################
+
+
+
+#Find the average age of an insured person:
+
+def find_average_age(age):
+	ages_floats = []
+	for number in age:
+		ages_floats.append(float(number))
+	ages_total = sum(ages_floats)
+	ages_average = ages_total / len(ages_floats)
+	return "The average age for an insured person is " + str(round(ages_average)) + "."
+
+#print(find_average_age(age))
+
+
+
+############################################################
+
+
+
+#Find out what region the majority of insured people live in
+
+def find_most_common_region(region):
+	most_common_region = ''
+	northeast_counter = 0
+	southeast_counter = 0
+	southwest_counter = 0
+	northwest_counter = 0
+	for place in region:
+		if place == 'northeast':
+			northeast_counter += 1
+		elif place == 'southeast':
+			southeast_counter += 1
+		elif place == 'southwest':
+			southwest_counter += 1
+		elif place == 'northwest':
+			northwest_counter += 1
+	if northeast_counter > southeast_counter and southwest_counter and northwest_counter:
+		most_common_region = 'northeast'
+	elif southeast_counter > northeast_counter and southwest_counter and northwest_counter:
+		most_common_region = 'southeast'
+	elif southwest_counter > northeast_counter and southeast_counter and northwest_counter:
+		most_common_region = 'southwest'
+	elif northwest_counter > northeast_counter and southeast_counter and southwest_counter:
+		most_common_region = 'northwest'
+	return "The majority of insured people in the U.S. live in the " + str(most_common_region) + "."
+
+#print(find_most_common_region(region))
+
+
+
+############################################################
+
+
+
+#Find the average difference in cost of insurance between smokers and non-smokers
+
+
+#First, get the indices from each type and put them in new lists:
+def get_smoker_indices(smoker, item):
+  return [i for i, x in enumerate(smoker) if x == item]
+
+yes_indices = (get_smoker_indices(smoker, "yes"))
+no_indices = (get_smoker_indices(smoker, "no"))
+
+#Next, use these lists to find the sum of all charges for each group:
+
+yes_charges = []
+no_charges = []
+
+for i in yes_indices:
+	yes_charges.append(float(charges[i]))
+for i in no_indices:
+	no_charges.append(float(charges[i]))
+
+total_yes_charges = sum(yes_charges) #$8,781,763.52
+total_no_charges = sum(no_charges) #$8,974,061.47
+
+#Next, find the number of people in each category, by which we will divide the totals to get the average cost:
+
+number_of_smokers = len(yes_indices) # 274
+number_of_non_smokers = len(no_indices) # 1064
+
+#Divide to get the averages:
+
+average_smoker_cost = total_yes_charges / number_of_smokers
+# $32,050.23
+average_non_smoker_cost = total_no_charges / number_of_non_smokers
+# $8,434.27
+
+# Do a subtraction to find the difference:
+
+smoker_difference = average_smoker_cost - average_non_smoker_cost
+smoker_difference_formatted = '{:,.2f}'.format(smoker_difference)
+
+#SMOKING COST PRINT STATEMENT
+
+print("On average, smokers pay $" + str(smoker_difference_formatted) + " more annually than non-smokers.")
+
+
+
+############################################################
